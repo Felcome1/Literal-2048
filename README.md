@@ -1,1 +1,1 @@
-My attempt to make 2048, using only characters.
+My 2048 interpretation in ASCII-art style.
