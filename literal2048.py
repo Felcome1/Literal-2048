@@ -1,295 +1,255 @@
-import keyboard
-from keyboard import is_pressed as press
+
+from keyboard import is_pressed, send
 import random
 from os import system  
 import time
 
 l = [' ','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z' ]
 ll = [' ','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z' ]
-pf = [
-[0,0,0,0],
-[0,0,0,0],
-[0,0,0,0],
-[0,0,0,0],
-     ]
-ppf = [
-[0,0,0,0],
-[0,0,0,0],
-[0,0,0,0],
-[0,0,0,0],
-     ]
-al = [' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',]
+
+pf = [[0 for i in range(4)] for i in range(4)]
+ppf = [[0 for i in range(4)] for i in range(4)]
+
+al = [' ' for i in range(16)]
 
 def rand():
 
-    pf0 = [
-    [1,1,1,1],
-    [1,1,1,1],
-    [1,1,1,1],
-    [1,1,1,1],
-    ]
-    pf0l = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
-    q = 0
-    def ec():
-        e = 0
-        while e != 4:
-            if pf[q][e] == 0:
-                pf0[q][e] = 0
-                pf0l[q*4+e] = 0
-            else:
-                pass
-            e += 1
-    while q != 4:
-        ec() # Seems cycle in cycle doesn't work, so here's a function
-        q += 1
-    c = 0 
-    gr = []
-    while c != 16:
-        if pf0l[c] == 0:
-            gr.append(c)
-        else:
-            pass
-        c += 1
+    pf0 = [[1 for i in range(4)] for j in range(4)]
+    pf0l = [1 for i in range(16)]
+    
+    for i in range(16):
+        n, n1 = int(i/4), int(i%4)
+        if not pf[n][n1]:
+            pf0[n][n1] = 0
+            pf0l[i] = 0
+    
+    gr = [i for i in range(16) if not pf0l[i]]
+
     if len(gr) >= 0:
         r = random.randint(0, len(gr)-1)
         rn = random.randint(0, 100)
-        if rn >= 90:
-            inum = 2
-        else:
-            inum = 1
-        pf[gr[r]//4][gr[r]%4] = inum
-    else:
-        pass
 
-def prbe():
-    q = 0
-    def ec2():
-        e = 0
-        while e != 4:
-            ppf[e][q] = pf[e][q]
-            e+=1
-    while q != 4:
-        ec2()
-        q+=1
+        inum = 2 if rn >= 90 else 1
+        pf[gr[r]//4][gr[r]%4] = inum
+
+def rewrite_prev_pf():
+
+    for i in range(16):
+        n, n1 = int(i/4), int(i%4)
+        ppf[n][n1] = pf[n][n1]
 
 def ui():
+
+    passed = False
+
     b = [[' ', ' ', ' ', ' '], [' ', ' ', ' ', ' '], [' ', ' ', ' ', ' '], [' ', ' ', ' ', ' ']]
-    ii = 0
-    def icounter():
-        i = 0
-        while i != 4:
-            if pf[ii][i] == ppf[ii][i]:
-                b[ii][i] = l[pf[ii][i]]
-            elif pf[ii][i] != ppf[ii][i] and ppf[ii][i] == 0:
-                b[ii][i] = '@' 
-            elif pf[ii][i] == ppf[ii][i] + 1 and ppf[ii][i] != 0:
-                b[ii][i] = '+' 
-            else:
-                b[ii][i] = ll[pf[ii][i]]
-            i += 1
-    while ii != 4:
-        icounter()
-        ii += 1
-    print('  ———————————————————————————————————————————————————————————————————————————————————————  ')
-    print('|                                                                                         |')
-    print('|                                                                                         |')
-    print('|                          ####        #####         ##       ###                         |')
-    print('|                        ##    ##     #     #       # #      #   #                        |')
-    print('|                              ##     #     #      #  #       ###                         |')
-    print('|                            ##       #     #     ######     #   #                        |')
-    print('|                          ##         #     #         #      #   #                        |')
-    print('|                        ########      #####          #       ###                         |')
-    print('|                                                                                         |')
-    print('|                                                                                         |')
-    print('|                                 —————   —————   —————   —————                           |')
-    print('|                               |       |       |       |       |                         |')
-    print('|        w — up                 |   '+b[0][0]+'   |   '+b[0][1]+'   |   '+b[0][2]+'   |   '+b[0][3]+'   |                         |')
-    print('|        s — down               |       |       |       |       |                         |')
-    print('|        a — left                 —————   —————   —————   —————                           |')
-    print('|        d — right              |       |       |       |       |                         |')
-    print('|        tab - return           |   '+b[1][0]+'   |   '+b[1][1]+'   |   '+b[1][2]+'   |   '+b[1][3]+'   |                         |')
-    print('|        r - restart            |       |       |       |       |                         |')
-    print('|                                 —————   —————   —————   —————                           |')
-    print('|                               |       |       |       |       |                         |')
-    print('|                               |   '+b[2][0]+'   |   '+b[2][1]+'   |   '+b[2][2]+'   |   '+b[2][3]+'   |                         |')
-    print('|                               |       |       |       |       |                         |')
-    print('|                                 —————   —————   —————   —————                           |')
-    print('|                               |       |       |       |       |                         |')
-    print('|                               |   '+b[3][0]+'   |   '+b[3][1]+'   |   '+b[3][2]+'   |   '+b[3][3]+'   |                         |')
-    print('|                               |       |       |       |       |                         |')
-    print('|                                 —————   —————   —————   —————                           |')
-    print('|                                                                                         |')
-    print('|                                                                                         |')
-    print('|                                                                                         |')
-    print('|                                                                                         |')
-    print('|                                                                                         |')
-    print('|                                                                                         |')
-    print("|                                                                                         |")
-    print('  ———————————————————————————————————————————————————————————————————————————————————————  ')
-    time.sleep(0.18)
-    system('cls')
-    print('  ———————————————————————————————————————————————————————————————————————————————————————  ')
-    print('|                                                                                         |')
-    print('|                                                                                         |')
-    print('|                          ####        #####         ##       ###                         |')
-    print('|                        ##    ##     #     #       # #      #   #                        |')
-    print('|                              ##     #     #      #  #       ###                         |')
-    print('|                            ##       #     #     ######     #   #                        |')
-    print('|                          ##         #     #         #      #   #                        |')
-    print('|                        ########      #####          #       ###                         |')
-    print('|                                                                                         |')
-    print('|                                                                                         |')
-    print('|                                 —————   —————   —————   —————                           |')
-    print('|                               |  '+al[0]*3+'  |  '+al[0]*3+'  |  '+al[0]*3+'  |  '+al[0]*3+'  |                         |')
-    print('|        w — up                 |   '+l[pf[0][0]]+'   |   '+l[pf[0][1]]+'   |   '+l[pf[0][2]]+'   |   '+l[pf[0][3]]+'   |                         |')
-    print('|        s — down               |       |       |       |       |                         |')
-    print('|        a — left                 —————   —————   —————   —————                           |')
-    print('|        d — right              |       |       |       |       |                         |')
-    print('|        tab - return           |   '+l[pf[1][0]]+'   |   '+l[pf[1][1]]+'   |   '+l[pf[1][2]]+'   |   '+l[pf[1][3]]+'   |                         |')
-    print('|        r - restart            |       |       |       |       |                         |')
-    print('|                                 —————   —————   —————   —————                           |')
-    print('|                               |       |       |       |       |                         |')
-    print('|                               |   '+l[pf[2][0]]+'   |   '+l[pf[2][1]]+'   |   '+l[pf[2][2]]+'   |   '+l[pf[2][3]]+'   |                         |')
-    print('|                               |       |       |       |       |                         |')
-    print('|                                 —————   —————   —————   —————                           |')
-    print('|                               |       |       |       |       |                         |')
-    print('|                               |   '+l[pf[3][0]]+'   |   '+l[pf[3][1]]+'   |   '+l[pf[3][2]]+'   |   '+l[pf[3][3]]+'   |                         |')
-    print('|                               |       |       |       |       |                         |')
-    print('|                                 —————   —————   —————   —————                           |')
-    print('|                                                                                         |')
-    print('|                                                                                         |')
-    print('|                                                                                         |')
-    print('|                                                                                         |')
-    print('|                                                                                         |')
-    print('|                                                                                         |')
-    print("|                                                                                         |")
-    print('  ———————————————————————————————————————————————————————————————————————————————————————  ')
+
+    for i in range(16):
+        
+        n, n1 = int(i/4), int(i%4)
+
+        if pf[n][n1] == ppf[n][n1]:
+            b[n][n1] = l[pf[n][n1]]
+
+        elif pf[n][n1] != ppf[n][n1] and ppf[n][n1] == 0:
+            b[n][n1] = '@' 
+
+        elif pf[n][n1] == ppf[n][n1] + 1 and ppf[n][n1] != 0:
+            b[n][n1] = '+' 
+
+        else:
+            b[n][n1] = ll[pf[n][n1]]
+
+    
+
+    for i in range(2):
+
+        a = [b[int(i/4)][int(i%4)] for i in range(16)] if not passed else [l[pf[int(i/4)][int(i%4)]] for i in range(16)]
+        
+        print('  ———————————————————————————————————————————————————————————————————————————————————————  ')
+        print('|                                                                                         |')
+        print('|                                                                                         |')
+        print('|                          ####        #####         ##       ###                         |')
+        print('|                        ##    ##     #     #       # #      #   #                        |')
+        print('|                              ##     #     #      #  #       ###                         |')
+        print('|                            ##       #     #     ######     #   #                        |')
+        print('|                          ##         #     #         #      #   #                        |')
+        print('|                        ########      #####          #       ###                         |')
+        print('|                                                                                         |')
+        print('|                                                                                         |')
+        print('|                                 —————   —————   —————   —————                           |')
+        print('|                               |       |       |       |       |                         |')
+        print('|        w — up                 |   '+a[0]+'   |   '+a[1]+'   |   '+a[2]+'   |   '+a[3]+'   |                         |')
+        print('|        s — down               |       |       |       |       |                         |')
+        print('|        a — left                 —————   —————   —————   —————                           |')
+        print('|        d — right              |       |       |       |       |                         |')
+        print('|        tab - return           |   '+a[4]+'   |   '+a[5]+'   |   '+a[6]+'   |   '+a[7]+'   |                         |')
+        print('|        r - restart            |       |       |       |       |                         |')
+        print('|                                 —————   —————   —————   —————                           |')
+        print('|                               |       |       |       |       |                         |')
+        print('|                               |   '+a[8]+'   |   '+a[9]+'   |   '+a[10]+'   |   '+a[11]+'   |                         |')
+        print('|                               |       |       |       |       |                         |')
+        print('|                                 —————   —————   —————   —————                           |')
+        print('|                               |       |       |       |       |                         |')
+        print('|                               |   '+a[12]+'   |   '+a[13]+'   |   '+a[14]+'   |   '+a[15]+'   |                         |')
+        print('|                               |       |       |       |       |                         |')
+        print('|                                 —————   —————   —————   —————                           |')
+        print('|                                                                                         |')
+        print('|                                                                                         |')
+        print('|                                                                                         |')
+        print('|                                                                                         |')
+        print('|                                                                                         |')
+        print('|                                                                                         |')
+        print("|                                                                                         |")
+        print('  ———————————————————————————————————————————————————————————————————————————————————————  ')
+
+
+
+        if not passed:
+            time.sleep(0.18)
+            system('cls')
+
+        passed = True
+
+
 def turnback():
-    q = 0
-    def ec1():
-        e = 0
-        while e != 4:
-            pf[e][q] = ppf[e][q]
-            e+=1
-    while q != 4:
-        ec1()
-        q+=1
+
+    for i in range(16):
+        n, n1 = int(i/4), int(i%4)
+        pf[n][n1] = ppf[n][n1]
+    
     ui()
 
 def move(mvd, mvdr):
-    i = 0
+
     id = [0,1,2,3], [3,2,1,0], [0,0,0,0]
     id1 = [0,1,2,3], [3,2,1,0], [0,0,0,0] 
-    mmt = False
-    prbe()
-    while i!=4:
+    triggered = False
+
+    rewrite_prev_pf()
+
+    for i in range(4):
+
         if pf[id[mvd][2]][id1[mvdr][2]] != 0 or pf[id[mvd][1]][id1[mvdr][1]] != 0 or pf[id[mvd][0]][id1[mvdr][0]] != 0:
             while pf[id[mvd][3]][id1[mvdr][3]] == 0:
                 pf[id[mvd][3]][id1[mvdr][3]] = pf[id[mvd][2]][id1[mvdr][2]]
                 pf[id[mvd][2]][id1[mvdr][2]] = pf[id[mvd][1]][id1[mvdr][1]]
                 pf[id[mvd][1]][id1[mvdr][1]] = pf[id[mvd][0]][id1[mvdr][0]]
                 pf[id[mvd][0]][id1[mvdr][0]] = 0
-                mmt = True
+                triggered = True
+
             if pf[id[mvd][1]][id1[mvdr][1]] != 0 or pf[id[mvd][0]][id1[mvdr][0]] != 0:
                 while pf[id[mvd][2]][id1[mvdr][2]] == 0:
                     pf[id[mvd][2]][id1[mvdr][2]] = pf[id[mvd][1]][id1[mvdr][1]]
                     pf[id[mvd][1]][id1[mvdr][1]] = pf[id[mvd][0]][id1[mvdr][0]]
                     pf[id[mvd][0]][id1[mvdr][0]] = 0
-                    mmt = True
-            else:
-                pass
+                    triggered = True
+            
             if pf[id[mvd][0]][id1[mvdr][0]] != 0 and pf[id[mvd][1]][id1[mvdr][1]] == 0:
                 pf[id[mvd][1]][id1[mvdr][1]] = pf[id[mvd][0]][id1[mvdr][0]]
                 pf[id[mvd][0]][id1[mvdr][0]] = 0
-                mmt = True
-        else:
-            pass
+                triggered = True
+            
+
         if pf[id[mvd][3]][id1[mvdr][3]] != 0 and pf[id[mvd][2]][id1[mvdr][2]] != 0:
+
+
             if pf[id[mvd][2]][id1[mvdr][2]] == pf[id[mvd][3]][id1[mvdr][3]]:
                 pf[id[mvd][3]][id1[mvdr][3]] = pf[id[mvd][3]][id1[mvdr][3]] + 1
-                mmt = True
+                triggered = True
                 pf[id[mvd][2]][id1[mvdr][2]] = pf[id[mvd][1]][id1[mvdr][1]]
                 pf[id[mvd][1]][id1[mvdr][1]] = pf[id[mvd][0]][id1[mvdr][0]]
                 pf[id[mvd][0]][id1[mvdr][0]] = 0
+
                 if pf[id[mvd][1]][id1[mvdr][1]] == pf[id[mvd][2]][id1[mvdr][2]] and pf[id[mvd][2]][id1[mvdr][2]] != 0:
                     pf[id[mvd][2]][id1[mvdr][2]] = pf[id[mvd][2]][id1[mvdr][2]] + 1
-                    mmt = True
+                    triggered = True
                     pf[id[mvd][1]][id1[mvdr][1]] = pf[id[mvd][0]][id1[mvdr][0]]
                     pf[id[mvd][0]][id1[mvdr][0]] = 0
+
+
             elif pf[id[mvd][1]][id1[mvdr][1]] == pf[id[mvd][2]][id1[mvdr][2]]:
                 pf[id[mvd][2]][id1[mvdr][2]] = pf[id[mvd][2]][id1[mvdr][2]] + 1
-                mmt = True
+                triggered = True
                 pf[id[mvd][1]][id1[mvdr][1]] = pf[id[mvd][0]][id1[mvdr][0]]
                 pf[id[mvd][0]][id1[mvdr][0]] = 0
+
+
             elif pf[id[mvd][0]][id1[mvdr][0]] == pf[id[mvd][1]][id1[mvdr][1]] and pf[id[mvd][1]][id1[mvdr][1]] != 0:
                 pf[id[mvd][1]][id1[mvdr][1]] = pf[id[mvd][1]][id1[mvdr][1]] + 1
-                mmt = True
+                triggered = True
                 pf[id[mvd][0]][id1[mvdr][0]] = 0
-        else:
-            pass
-        i += 1
-        idc = 0
-        while idc != 4:
+
+        for idc in range(4):
             id[2][idc] += 1
             id1[2][idc] += 1
-            idc += 1
+
+
     system('cls')
-    if mmt == True:
+
+    if triggered:
+
         rand()
-    else:
-        pass
+
     ui()
 
+
 def retry():
+
+    send('enter')
     system('cls')
-    system('color 07')
+    #system('color 07')
+
     while True:
-        let = input('Wanna try again?\n Y - yes    N - no\n/=\  \n' + ' ')
+
+        let = input('Wanna try again?\n Y - yes    N - no\n/=\  \n' + ' ').capitalize()
+
         if let == 'Y':
             system('cls')
             ui()
-            return(True)
+            return True
+
         elif let == 'N':
             system('cls')
             ui()
-            return(False)
+            return False
         else:
             system('cls')
-            pass
             
 while True:
+
     if pf == [[0,0,0,0], [0,0,0,0], [0,0,0,0], [0,0,0,0]]:
         rand()
         rand()
-    system('color E6')
-    prbe()
+
+    #system('color E6')
+    rewrite_prev_pf()
     ui()
+
     while True:
-        if press('w'):
+
+        if is_pressed('w'):
             move(1, 2)
-            time.sleep(0)
-            pass
-        elif press('a'):
+
+        elif is_pressed('a'):
             move(2, 1)
-            time.sleep(0)
-            pass
-        elif press('s'):
+
+        elif is_pressed('s'):
             move(0, 2)
-            time.sleep(0)
-            pass
-        elif press('d'):
+
+        elif is_pressed('d'):
             move(2, 0)
-            time.sleep(0)
-            pass
-        elif press('r'):
+
+        elif is_pressed('r'):
             break
-        elif press('tab'):
+
+        elif is_pressed('tab'):
             turnback()
-            time.sleep(0)
-            pass
+
+
     if retry() == True:
         pf = [[0,0,0,0], [0,0,0,0], [0,0,0,0], [0,0,0,0]]
         system('cls')
-        pass
+
     else:
         continue
