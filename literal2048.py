@@ -1,71 +1,68 @@
-
 from keyboard import is_pressed, send
 import random
-from os import system  
+from os import system
 import time
 
-l = [' ','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z' ]
-ll = [' ','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z' ]
+l = [' ', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
+     'W', 'X', 'Y', 'Z']
+l_lo = [' ', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
+      'w', 'x', 'y', 'z']
 
-pf = [[0 for i in range(4)] for i in range(4)]
-ppf = [[0 for i in range(4)] for i in range(4)]
-
-al = [' ' for i in range(16)]
+board = [[0 for i in range(4)] for i in range(4)]
+prev_board = [[0 for i in range(4)] for i in range(4)]
 
 def rand():
 
-    pf0 = [[1 for i in range(4)] for j in range(4)]
-    pf0l = [1 for i in range(16)]
-    
+    ll_board_bool = [[1 for i in range(4)] for j in range(4)]
+    l_board_bool = [1 for i in range(16)]
+
+    for field in range(16):
+        y, x = int(field / 4), int(field % 4)
+        if not board[y][x]:
+            ll_board_bool[y][x] = 0
+            l_board_bool[field] = 0
+
+    free_field = [field for field in range(16) if not l_board_bool[field]]
+
+    if len(free_field) >= 0:
+
+        rand_field = random.randint(0, len(free_field) - 1)
+        val = 2 if random.randint(0, 100) >= 90 else 1
+        board[free_field[rand_field] // 4][free_field[rand_field] % 4] = val
+
+
+def save_board():
+
     for i in range(16):
-        n, n1 = int(i/4), int(i%4)
-        if not pf[n][n1]:
-            pf0[n][n1] = 0
-            pf0l[i] = 0
-    
-    gr = [i for i in range(16) if not pf0l[i]]
+        y, x = int(i / 4), int(i % 4)
+        prev_board[y][x] = board[y][x]
 
-    if len(gr) >= 0:
-        r = random.randint(0, len(gr)-1)
-        rn = random.randint(0, 100)
-
-        inum = 2 if rn >= 90 else 1
-        pf[gr[r]//4][gr[r]%4] = inum
-
-def rewrite_prev_pf():
-
-    for i in range(16):
-        n, n1 = int(i/4), int(i%4)
-        ppf[n][n1] = pf[n][n1]
 
 def ui():
 
     passed = False
+    board_anim = [[' ', ' ', ' ', ' '], [' ', ' ', ' ', ' '], [' ', ' ', ' ', ' '], [' ', ' ', ' ', ' ']]
 
-    b = [[' ', ' ', ' ', ' '], [' ', ' ', ' ', ' '], [' ', ' ', ' ', ' '], [' ', ' ', ' ', ' ']]
+    for f_index in range(16):
 
-    for i in range(16):
-        
-        n, n1 = int(i/4), int(i%4)
+        y, x = int(f_index / 4), int(f_index % 4)
 
-        if pf[n][n1] == ppf[n][n1]:
-            b[n][n1] = l[pf[n][n1]]
+        if board[y][x] == prev_board[y][x]:
+            board_anim[y][x] = l[board[y][x]]
 
-        elif pf[n][n1] != ppf[n][n1] and ppf[n][n1] == 0:
-            b[n][n1] = '@' 
+        elif board[y][x] != prev_board[y][x] and prev_board[y][x] == 0:
+            board_anim[y][x] = '@'
 
-        elif pf[n][n1] == ppf[n][n1] + 1 and ppf[n][n1] != 0:
-            b[n][n1] = '+' 
+        elif board[y][x] == prev_board[y][x] + 1 and prev_board[y][x] != 0:
+            board_anim[y][x] = '+'
 
         else:
-            b[n][n1] = ll[pf[n][n1]]
-
-    
+            board_anim[y][x] = l_lo[board[y][x]]
 
     for i in range(2):
+        a = [board_anim[int(i / 4)][int(i % 4)] for i in range(16)] if not passed else [l[board[int(i / 4)][int(i % 4)]] for i in
+                                                                               range(16)]
 
-        a = [b[int(i/4)][int(i%4)] for i in range(16)] if not passed else [l[pf[int(i/4)][int(i%4)]] for i in range(16)]
-        
         print('  ———————————————————————————————————————————————————————————————————————————————————————  ')
         print('|                                                                                         |')
         print('|                                                                                         |')
@@ -79,19 +76,23 @@ def ui():
         print('|                                                                                         |')
         print('|                                 —————   —————   —————   —————                           |')
         print('|                               |       |       |       |       |                         |')
-        print('|        w — up                 |   '+a[0]+'   |   '+a[1]+'   |   '+a[2]+'   |   '+a[3]+'   |                         |')
+        print('|        w — up                 |   ' + a[0] + '   |   ' + a[1] + '   |   ' + a[2] + '   |   ' + a[
+            3] + '   |                         |')
         print('|        s — down               |       |       |       |       |                         |')
         print('|        a — left                 —————   —————   —————   —————                           |')
         print('|        d — right              |       |       |       |       |                         |')
-        print('|        tab - return           |   '+a[4]+'   |   '+a[5]+'   |   '+a[6]+'   |   '+a[7]+'   |                         |')
+        print('|        tab - return           |   ' + a[4] + '   |   ' + a[5] + '   |   ' + a[6] + '   |   ' + a[
+            7] + '   |                         |')
         print('|        r - restart            |       |       |       |       |                         |')
         print('|                                 —————   —————   —————   —————                           |')
         print('|                               |       |       |       |       |                         |')
-        print('|                               |   '+a[8]+'   |   '+a[9]+'   |   '+a[10]+'   |   '+a[11]+'   |                         |')
+        print('|                               |   ' + a[8] + '   |   ' + a[9] + '   |   ' + a[10] + '   |   ' + a[
+            11] + '   |                         |')
         print('|                               |       |       |       |       |                         |')
         print('|                                 —————   —————   —————   —————                           |')
         print('|                               |       |       |       |       |                         |')
-        print('|                               |   '+a[12]+'   |   '+a[13]+'   |   '+a[14]+'   |   '+a[15]+'   |                         |')
+        print('|                               |   ' + a[12] + '   |   ' + a[13] + '   |   ' + a[14] + '   |   ' + a[
+            15] + '   |                         |')
         print('|                               |       |       |       |       |                         |')
         print('|                                 —————   —————   —————   —————                           |')
         print('|                                                                                         |')
@@ -103,102 +104,95 @@ def ui():
         print("|                                                                                         |")
         print('  ———————————————————————————————————————————————————————————————————————————————————————  ')
 
-
-
         if not passed:
             time.sleep(0.18)
             system('cls')
 
         passed = True
 
-
 def turnback():
 
     for i in range(16):
-        n, n1 = int(i/4), int(i%4)
-        pf[n][n1] = ppf[n][n1]
-    
+        n, n1 = int(i / 4), int(i % 4)
+        board[n][n1] = prev_board[n][n1]
+
     ui()
 
-def move(mvd, mvdr):
 
-    id = [0,1,2,3], [3,2,1,0], [0,0,0,0]
-    id1 = [0,1,2,3], [3,2,1,0], [0,0,0,0] 
+def move(dir_y, dir_x):
+
+    index_y = [0, 1, 2, 3], [3, 2, 1, 0], [0, 0, 0, 0]
+    index_x = [0, 1, 2, 3], [3, 2, 1, 0], [0, 0, 0, 0]
     triggered = False
 
-    rewrite_prev_pf()
+    save_board()
 
     for i in range(4):
 
-        if pf[id[mvd][2]][id1[mvdr][2]] != 0 or pf[id[mvd][1]][id1[mvdr][1]] != 0 or pf[id[mvd][0]][id1[mvdr][0]] != 0:
-            while pf[id[mvd][3]][id1[mvdr][3]] == 0:
-                pf[id[mvd][3]][id1[mvdr][3]] = pf[id[mvd][2]][id1[mvdr][2]]
-                pf[id[mvd][2]][id1[mvdr][2]] = pf[id[mvd][1]][id1[mvdr][1]]
-                pf[id[mvd][1]][id1[mvdr][1]] = pf[id[mvd][0]][id1[mvdr][0]]
-                pf[id[mvd][0]][id1[mvdr][0]] = 0
+        if board[index_y[dir_y][2]][index_x[dir_x][2]] != 0 or board[index_y[dir_y][1]][index_x[dir_x][1]] != 0 or board[index_y[dir_y][0]][index_x[dir_x][0]] != 0:
+            while board[index_y[dir_y][3]][index_x[dir_x][3]] == 0:
+                board[index_y[dir_y][3]][index_x[dir_x][3]] = board[index_y[dir_y][2]][index_x[dir_x][2]]
+                board[index_y[dir_y][2]][index_x[dir_x][2]] = board[index_y[dir_y][1]][index_x[dir_x][1]]
+                board[index_y[dir_y][1]][index_x[dir_x][1]] = board[index_y[dir_y][0]][index_x[dir_x][0]]
+                board[index_y[dir_y][0]][index_x[dir_x][0]] = 0
                 triggered = True
 
-            if pf[id[mvd][1]][id1[mvdr][1]] != 0 or pf[id[mvd][0]][id1[mvdr][0]] != 0:
-                while pf[id[mvd][2]][id1[mvdr][2]] == 0:
-                    pf[id[mvd][2]][id1[mvdr][2]] = pf[id[mvd][1]][id1[mvdr][1]]
-                    pf[id[mvd][1]][id1[mvdr][1]] = pf[id[mvd][0]][id1[mvdr][0]]
-                    pf[id[mvd][0]][id1[mvdr][0]] = 0
+            if board[index_y[dir_y][1]][index_x[dir_x][1]] != 0 or board[index_y[dir_y][0]][index_x[dir_x][0]] != 0:
+                while board[index_y[dir_y][2]][index_x[dir_x][2]] == 0:
+                    board[index_y[dir_y][2]][index_x[dir_x][2]] = board[index_y[dir_y][1]][index_x[dir_x][1]]
+                    board[index_y[dir_y][1]][index_x[dir_x][1]] = board[index_y[dir_y][0]][index_x[dir_x][0]]
+                    board[index_y[dir_y][0]][index_x[dir_x][0]] = 0
                     triggered = True
-            
-            if pf[id[mvd][0]][id1[mvdr][0]] != 0 and pf[id[mvd][1]][id1[mvdr][1]] == 0:
-                pf[id[mvd][1]][id1[mvdr][1]] = pf[id[mvd][0]][id1[mvdr][0]]
-                pf[id[mvd][0]][id1[mvdr][0]] = 0
+
+            if board[index_y[dir_y][0]][index_x[dir_x][0]] != 0 and board[index_y[dir_y][1]][index_x[dir_x][1]] == 0:
+                board[index_y[dir_y][1]][index_x[dir_x][1]] = board[index_y[dir_y][0]][index_x[dir_x][0]]
+                board[index_y[dir_y][0]][index_x[dir_x][0]] = 0
                 triggered = True
-            
 
-        if pf[id[mvd][3]][id1[mvdr][3]] != 0 and pf[id[mvd][2]][id1[mvdr][2]] != 0:
+        if board[index_y[dir_y][3]][index_x[dir_x][3]] != 0 and board[index_y[dir_y][2]][index_x[dir_x][2]] != 0:
 
-
-            if pf[id[mvd][2]][id1[mvdr][2]] == pf[id[mvd][3]][id1[mvdr][3]]:
-                pf[id[mvd][3]][id1[mvdr][3]] = pf[id[mvd][3]][id1[mvdr][3]] + 1
+            if board[index_y[dir_y][2]][index_x[dir_x][2]] == board[index_y[dir_y][3]][index_x[dir_x][3]]:
+                board[index_y[dir_y][3]][index_x[dir_x][3]] = board[index_y[dir_y][3]][index_x[dir_x][3]] + 1
                 triggered = True
-                pf[id[mvd][2]][id1[mvdr][2]] = pf[id[mvd][1]][id1[mvdr][1]]
-                pf[id[mvd][1]][id1[mvdr][1]] = pf[id[mvd][0]][id1[mvdr][0]]
-                pf[id[mvd][0]][id1[mvdr][0]] = 0
+                board[index_y[dir_y][2]][index_x[dir_x][2]] = board[index_y[dir_y][1]][index_x[dir_x][1]]
+                board[index_y[dir_y][1]][index_x[dir_x][1]] = board[index_y[dir_y][0]][index_x[dir_x][0]]
+                board[index_y[dir_y][0]][index_x[dir_x][0]] = 0
 
-                if pf[id[mvd][1]][id1[mvdr][1]] == pf[id[mvd][2]][id1[mvdr][2]] and pf[id[mvd][2]][id1[mvdr][2]] != 0:
-                    pf[id[mvd][2]][id1[mvdr][2]] = pf[id[mvd][2]][id1[mvdr][2]] + 1
+                if board[index_y[dir_y][1]][index_x[dir_x][1]] == board[index_y[dir_y][2]][index_x[dir_x][2]] and board[index_y[dir_y][2]][index_x[dir_x][2]] != 0:
+                    board[index_y[dir_y][2]][index_x[dir_x][2]] = board[index_y[dir_y][2]][index_x[dir_x][2]] + 1
                     triggered = True
-                    pf[id[mvd][1]][id1[mvdr][1]] = pf[id[mvd][0]][id1[mvdr][0]]
-                    pf[id[mvd][0]][id1[mvdr][0]] = 0
+                    board[index_y[dir_y][1]][index_x[dir_x][1]] = board[index_y[dir_y][0]][index_x[dir_x][0]]
+                    board[index_y[dir_y][0]][index_x[dir_x][0]] = 0
 
 
-            elif pf[id[mvd][1]][id1[mvdr][1]] == pf[id[mvd][2]][id1[mvdr][2]]:
-                pf[id[mvd][2]][id1[mvdr][2]] = pf[id[mvd][2]][id1[mvdr][2]] + 1
+            elif board[index_y[dir_y][1]][index_x[dir_x][1]] == board[index_y[dir_y][2]][index_x[dir_x][2]]:
+                board[index_y[dir_y][2]][index_x[dir_x][2]] = board[index_y[dir_y][2]][index_x[dir_x][2]] + 1
                 triggered = True
-                pf[id[mvd][1]][id1[mvdr][1]] = pf[id[mvd][0]][id1[mvdr][0]]
-                pf[id[mvd][0]][id1[mvdr][0]] = 0
+                board[index_y[dir_y][1]][index_x[dir_x][1]] = board[index_y[dir_y][0]][index_x[dir_x][0]]
+                board[index_y[dir_y][0]][index_x[dir_x][0]] = 0
 
 
-            elif pf[id[mvd][0]][id1[mvdr][0]] == pf[id[mvd][1]][id1[mvdr][1]] and pf[id[mvd][1]][id1[mvdr][1]] != 0:
-                pf[id[mvd][1]][id1[mvdr][1]] = pf[id[mvd][1]][id1[mvdr][1]] + 1
+            elif board[index_y[dir_y][0]][index_x[dir_x][0]] == board[index_y[dir_y][1]][index_x[dir_x][1]] and board[index_y[dir_y][1]][index_x[dir_x][1]] != 0:
+                board[index_y[dir_y][1]][index_x[dir_x][1]] = board[index_y[dir_y][1]][index_x[dir_x][1]] + 1
                 triggered = True
-                pf[id[mvd][0]][id1[mvdr][0]] = 0
+                board[index_y[dir_y][0]][index_x[dir_x][0]] = 0
 
-        for idc in range(4):
-            id[2][idc] += 1
-            id1[2][idc] += 1
-
+        for index in range(4):
+            index_y[2][index] += 1
+            index_x[2][index] += 1
 
     system('cls')
 
     if triggered:
-
         rand()
 
     ui()
 
 
 def retry():
-
     send('enter')
     system('cls')
-    #system('color 07')
+    # system('color 07')
 
     while True:
 
@@ -213,17 +207,19 @@ def retry():
             system('cls')
             ui()
             return False
+
         else:
             system('cls')
-            
+
+
 while True:
 
-    if pf == [[0,0,0,0], [0,0,0,0], [0,0,0,0], [0,0,0,0]]:
+    if board == [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]:
         rand()
         rand()
 
-    #system('color E6')
-    rewrite_prev_pf()
+    # system('color E6')
+    save_board()
     ui()
 
     while True:
@@ -246,9 +242,8 @@ while True:
         elif is_pressed('tab'):
             turnback()
 
-
     if retry() == True:
-        pf = [[0,0,0,0], [0,0,0,0], [0,0,0,0], [0,0,0,0]]
+        board = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
         system('cls')
 
     else:
